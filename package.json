@@ -1,0 +1,18 @@
+{
+  "name": "keepertest",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "@types/node": "^16.10.2",
+    "node-fetch": "^2.6.1",
+    "ts-node": "^10.2.1",
+    "tsc": "^2.0.3",
+    "typescript": "^4.4.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "tsc && node ./dist"
+  },
+  "author": "",
+  "license": "ISC"
+}
