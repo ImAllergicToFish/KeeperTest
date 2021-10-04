@@ -13,17 +13,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_fetch_1 = __importDefault(require("node-fetch"));
-class AuthMe {
-    constructor(url, Bearer) {
+class PostProxy {
+    constructor(url, tenantId, Bearer, ip, port) {
         this.options = {
-            method: 'GET',
+            method: 'POST',
             headers: {
-                Authorization: 'Bearer '
+                'Authorization': 'Bearer ',
+                'accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: ''
+        };
+        this.token = null;
+        this.refreshToken = null;
+        this.url = url + "api/tenant/" + tenantId + "/proxy";
+        this.options.headers.Authorization += Bearer;
+        const body = {
+            data: {
+                ip: ip,
+                port: port
             }
         };
-        this.tenantId = null;
-        this.url = url + "api/auth/me";
-        this.options.headers.Authorization += Bearer;
+        this.options.body = JSON.stringify(body);
     }
     req() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -35,18 +46,30 @@ class AuthMe {
             return data;
         });
     }
-    getTenantId() {
+    getToken() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.tenantId != null) {
-                return String(this.tenantId);
+            if (this.token != null) {
+                return this.token;
             }
             else {
-                const user = yield this.req();
-                this.tenantId = user.tenants[0].tenant._id;
-                return String(this.tenantId);
+                const proxy = yield this.req();
+                this.token = proxy.token;
+                return this.token;
+            }
+        });
+    }
+    getRefreshToken() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.refreshToken != null) {
+                return this.refreshToken;
+            }
+            else {
+                const proxy = yield this.req();
+                this.refreshToken = proxy.refreshToken;
+                return this.refreshToken;
             }
         });
     }
 }
-exports.default = AuthMe;
-//# sourceMappingURL=authMe.js.map
+exports.default = PostProxy;
+//# sourceMappingURL=postProxy.js.map

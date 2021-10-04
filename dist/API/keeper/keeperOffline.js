@@ -13,40 +13,50 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_fetch_1 = __importDefault(require("node-fetch"));
-class AuthMe {
-    constructor(url, Bearer) {
+class KeeperOffline {
+    constructor(url, tenantId, Bearer, keeperId, proxyToken) {
         this.options = {
-            method: 'GET',
+            method: 'POST',
             headers: {
-                Authorization: 'Bearer '
-            }
+                'Authorization': 'Bearer ',
+                'accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: ''
         };
-        this.tenantId = null;
-        this.url = url + "api/auth/me";
+        this.session = null;
+        this.url = url + "api/tenant/" + tenantId + "/keeper/" + keeperId + "/offline";
         this.options.headers.Authorization += Bearer;
+        const body = {
+            token: proxyToken
+        };
+        this.options.body = JSON.stringify(body);
     }
     req() {
         return __awaiter(this, void 0, void 0, function* () {
             const response = yield node_fetch_1.default(this.url, this.options);
-            if (response.status != 200) {
+            if (response.status != 200 && response.status != 403) {
                 throw new Error("Error code: " + response.status);
+            }
+            if (response.status == 403) {
+                return "exp";
             }
             const data = yield response.json();
             return data;
         });
     }
-    getTenantId() {
+    getSession() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.tenantId != null) {
-                return String(this.tenantId);
+            if (this.session != null) {
+                return String(this.session);
             }
             else {
-                const user = yield this.req();
-                this.tenantId = user.tenants[0].tenant._id;
-                return String(this.tenantId);
+                const keeper = yield this.req();
+                this.session = keeper.session;
+                return String(this.session);
             }
         });
     }
 }
-exports.default = AuthMe;
-//# sourceMappingURL=authMe.js.map
+exports.default = KeeperOffline;
+//# sourceMappingURL=keeperOffline.js.map

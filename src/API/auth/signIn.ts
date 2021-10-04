@@ -23,6 +23,9 @@ export default class SignIn {
 
     async req() {
         const response = await fetch(this.url, this.options);
+        if (response.status != 200) {
+            throw new Error("Error code: " + response.status)   
+        }
         return response.text()
     }
 }
